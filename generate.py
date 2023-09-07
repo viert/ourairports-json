@@ -27,6 +27,3 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
     generate_airports()
-    if repo_changed():
-        sys.exit(1)
-    sys.exit(0)
