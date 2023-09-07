@@ -1,10 +1,8 @@
 import os
 import json
 import logging
-import sys
 
-from ourairports.parsers import parse_airports
-from ourairports.misc import repo_changed
+from ourairports.parsers import parse_airports, parse_countries
 
 OUTPUT_FOLDER = "output"
 
@@ -23,7 +21,22 @@ def generate_airports():
         json.dump(arpt_map, f)
 
 
+def generate_countries():
+    logging.info("loading and parsing countries")
+    countries = parse_countries()
+    logging.info("generating country list")
+    country_list = [cntr.model_dump() for cntr in countries]
+    logging.info("generating country map")
+    country_map = {cntr.code: cntr.model_dump() for cntr in countries}
+    logging.info("dumping country data")
+    with open(f"{OUTPUT_FOLDER}/country_list.json", "w") as f:
+        json.dump(country_list, f, indent=2)
+    with open(f"{OUTPUT_FOLDER}/country_map.json", "w") as f:
+        json.dump(country_map, f)
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
     generate_airports()
+    generate_countries()

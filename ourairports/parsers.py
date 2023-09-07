@@ -1,17 +1,31 @@
 import io
 import requests
-from typing import List
+from typing import List, Generator, Dict, Any
 from csv import DictReader
-from ourairports.types import Airport
+from ourairports.types import Airport, Country
 
 
 AIRPORTS_URL = "https://davidmegginson.github.io/ourairports-data/airports.csv"
+NAV_AIDS_URL = "https://davidmegginson.github.io/ourairports-data/navaids.csv"
+COUNTRIES_URL = "https://davidmegginson.github.io/ourairports-data/countries.csv"
+REGIONS_URL = "https://davidmegginson.github.io/ourairports-data/regions.csv"
+
+
+def load(url: str) -> Generator[Dict[str, Any], None, None]:
+    data = requests.get(url)
+    rdr = io.StringIO(data.text)
+    csv_rdr = DictReader(rdr)
+    for row in csv_rdr:
+        yield row
 
 
 def parse_airports() -> List[Airport]:
-    data = requests.get(AIRPORTS_URL)
-    rdr = io.StringIO(data.text)
-    csv_rdr = DictReader(rdr)
-    airports = [Airport(**row) for row in csv_rdr]
+    airports = [Airport(**row) for row in load(AIRPORTS_URL)]
     airports.sort(key=lambda x: x.id)
     return airports
+
+
+def parse_countries() -> List[Country]:
+    countries = [Country(**row) for row in load(COUNTRIES_URL)]
+    countries.sort(key=lambda x: x.id)
+    return countries

@@ -1,5 +1,13 @@
-from typing import Optional, Any, List
-from pydantic import BaseModel, field_validator
+from typing import Optional, Any, List, Callable, Annotated
+from pydantic import BaseModel, field_validator, ValidationInfo, BeforeValidator
+
+
+def make_csl_converter(label: str) -> Callable[[str, ValidationInfo], List[str]]:
+    def converter(v: str, info: ValidationInfo) -> List[str]:
+        if v.strip() == "":
+            return []
+        return [x.strip() for x in v.split(",")]
+    return converter
 
 
 class Airport(BaseModel):
@@ -20,7 +28,7 @@ class Airport(BaseModel):
     local_code: str
     home_link: str
     wikipedia_link: str
-    keywords: List[str]
+    keywords: Annotated[List[str], BeforeValidator(make_csl_converter("keywords"))]
 
     @field_validator("elevation_ft", mode="before")
     @classmethod
@@ -30,14 +38,16 @@ class Airport(BaseModel):
         except ValueError:
             return None
 
-    @field_validator("keywords", mode="before")
-    @classmethod
-    def convert_keywords(cls, v: Any) -> List[str]:
-        if v == '':
-            return []
-        return v.split(",")
-
     @field_validator("scheduled_service", mode="before")
     @classmethod
     def convert_scheduled_service(cls, v: Any) -> bool:
         return v == "yes"
+
+
+class Country(BaseModel):
+    id: int
+    code: str
+    name: str
+    continent: str
+    wikipedia_link: str
+    keywords: Annotated[List[str], BeforeValidator(make_csl_converter("keywords"))]
