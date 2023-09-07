@@ -4,5 +4,5 @@ GIT_BINARY = "/usr/bin/git"
 
 
 def repo_changed() -> bool:
-    output = check_output([GIT_BINARY, "status", "-z"])
+    output = check_output([GIT_BINARY, "status", "-z"]).decode()
     return output.strip() != ""
