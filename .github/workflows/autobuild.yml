@@ -30,6 +30,7 @@ jobs:
           python3.11 generate.py
       - name: GIT Commit Artifacts
         run: |
+          git config --global --add safe.directory "${{ env.GITHUB_WORKSPACE }}"
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "username@users.noreply.github.com"
           git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
