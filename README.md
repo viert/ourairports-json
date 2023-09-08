@@ -26,7 +26,7 @@ with more data validations etc.
 
 ### What's inside?
 
-At the moment only airports and countries are parsed. NavAids and Runways will show up
+At the moment only airports, runways, and countries are parsed. NavAids will show up
 shortly (as I need them most myself), the rest of the data comes last.
 
 ### Credits

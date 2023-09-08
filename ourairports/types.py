@@ -2,12 +2,34 @@ from typing import Optional, Any, List, Callable, Annotated
 from pydantic import BaseModel, field_validator, ValidationInfo, BeforeValidator
 
 
-def make_csl_converter(label: str) -> Callable[[str, ValidationInfo], List[str]]:
-    def converter(v: str, info: ValidationInfo) -> List[str]:
-        if v.strip() == "":
-            return []
-        return [x.strip() for x in v.split(",")]
+def make_bool_converter(true_value: str) -> Callable[[str, ValidationInfo], bool]:
+    def converter(v: str, _: ValidationInfo) -> bool:
+        return v == true_value
     return converter
+
+
+def csl_converter(v: str, _: ValidationInfo) -> List[str]:
+    if v.strip() == "":
+        return []
+    return [x.strip() for x in v.split(",")]
+
+
+def try_int_converter(v: str, _: ValidationInfo) -> Optional[int]:
+    if v == "":
+        return None
+    try:
+        return int(v)
+    except ValueError:
+        return None
+
+
+def try_float_converter(v: str, _: ValidationInfo) -> Optional[float]:
+    if v == "":
+        return None
+    try:
+        return float(v)
+    except ValueError:
+        return None
 
 
 class Airport(BaseModel):
@@ -17,31 +39,18 @@ class Airport(BaseModel):
     name: str
     latitude_deg: float
     longitude_deg: float
-    elevation_ft: Optional[int]
+    elevation_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
     continent: str
     iso_country: str
     iso_region: str
     municipality: str
-    scheduled_service: bool
+    scheduled_service: Annotated[bool, BeforeValidator(make_bool_converter("yes"))]
     gps_code: str
     iata_code: str
     local_code: str
     home_link: str
     wikipedia_link: str
-    keywords: Annotated[List[str], BeforeValidator(make_csl_converter("keywords"))]
-
-    @field_validator("elevation_ft", mode="before")
-    @classmethod
-    def convert_elevation(cls, v: Any) -> Optional[int]:
-        try:
-            return int(v)
-        except ValueError:
-            return None
-
-    @field_validator("scheduled_service", mode="before")
-    @classmethod
-    def convert_scheduled_service(cls, v: Any) -> bool:
-        return v == "yes"
+    keywords: Annotated[List[str], BeforeValidator(csl_converter)]
 
 
 class Country(BaseModel):
@@ -50,4 +59,27 @@ class Country(BaseModel):
     name: str
     continent: str
     wikipedia_link: str
-    keywords: Annotated[List[str], BeforeValidator(make_csl_converter("keywords"))]
+    keywords: Annotated[List[str], BeforeValidator(csl_converter)]
+
+
+class Runway(BaseModel):
+    id: int
+    airport_ref: int
+    airport_ident: str
+    length_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    width_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    surface: str
+    lighted: bool
+    closed: bool
+    le_ident: str
+    le_latitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
+    le_longitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
+    le_elevation_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    le_heading_degT: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    le_displaced_threshold_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    he_ident: str
+    he_latitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
+    he_longitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
+    he_elevation_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    he_heading_degT: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    he_displaced_threshold_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
