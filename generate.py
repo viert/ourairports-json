@@ -3,7 +3,7 @@ import json
 import logging
 
 from collections import defaultdict
-from ourairports.parsers import parse_airports, parse_countries, parse_runways
+from ourairports.parsers import parse_airports, parse_countries, parse_runways, parse_navaids
 
 OUTPUT_FOLDER = "output"
 
@@ -53,9 +53,29 @@ def generate_runways():
         json.dump(runway_map, f)
 
 
+def generate_navaids():
+    logging.info("loading and parsing navaids")
+    navaids = parse_navaids()
+    logging.info("generating navaid structures")
+    navaid_list = []
+    navaid_map = defaultdict(list)
+
+    for nav in navaids:
+        dump = nav.model_dump(exclude_none=True)
+        navaid_list.append(dump)
+        navaid_map[nav.ident].append(dump)
+
+    logging.info("dumping navaid data")
+    with open(f"{OUTPUT_FOLDER}/navaid_list.json", "w") as f:
+        json.dump(navaid_list, f)
+    with open(f"{OUTPUT_FOLDER}/navaid_map.json", "w") as f:
+        json.dump(navaid_map, f)
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
     generate_airports()
     generate_countries()
     generate_runways()
+    generate_navaids()

@@ -26,8 +26,8 @@ with more data validations etc.
 
 ### What's inside?
 
-At the moment only airports, runways, and countries are parsed. NavAids will show up
-shortly (as I need them most myself), the rest of the data comes last.
+Supported data models: **airports**, **runways**, **countries** and **navaids**. 
+The rest of the datasets will be available later.
 
 ### Credits
 

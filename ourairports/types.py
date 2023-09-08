@@ -23,6 +23,12 @@ def try_int_converter(v: str, _: ValidationInfo) -> Optional[int]:
         return None
 
 
+def non_empty_str_or_null(v: str, _: ValidationInfo) -> Optional[str]:
+    if v == "":
+        return None
+    return v
+
+
 def try_float_converter(v: str, _: ValidationInfo) -> Optional[float]:
     if v == "":
         return None
@@ -83,3 +89,25 @@ class Runway(BaseModel):
     he_elevation_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
     he_heading_degT: Annotated[Optional[int], BeforeValidator(try_int_converter)]
     he_displaced_threshold_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+
+
+class NavAid(BaseModel):
+    id: int
+    ident: str
+    name: str
+    type: str
+    frequency_khz: int
+    latitude_deg: float
+    longitude_deg: float
+    elevation_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    iso_country: str
+    dme_frequency_khz: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    dme_channel: Annotated[Optional[str], BeforeValidator(non_empty_str_or_null)]
+    dme_latitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
+    dme_longitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
+    dme_elevation_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    slaved_variation_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
+    magnetic_variation_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
+    usageType: Annotated[Optional[str], BeforeValidator(non_empty_str_or_null)]
+    power: Annotated[Optional[str], BeforeValidator(non_empty_str_or_null)]
+    associated_airport: Annotated[Optional[str], BeforeValidator(non_empty_str_or_null)]
