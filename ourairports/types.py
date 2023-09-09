@@ -1,21 +1,27 @@
-from typing import Optional, Any, List, Callable, Annotated
-from pydantic import BaseModel, field_validator, ValidationInfo, BeforeValidator
+from typing import Optional, List, Callable, Annotated, Dict, Any
+from pydantic import BaseModel, ValidationInfo, BeforeValidator
 
 
 def make_bool_converter(true_value: str) -> Callable[[str, ValidationInfo], bool]:
-    def converter(v: str, _: ValidationInfo) -> bool:
+    def converter(v: str | bool, _: ValidationInfo) -> bool:
+        if isinstance(v, bool):
+            return v
         return v == true_value
     return converter
 
 
-def csl_converter(v: str, _: ValidationInfo) -> List[str]:
+def csl_converter(v: List | str, _: ValidationInfo) -> List[str]:
+    if isinstance(v, list):
+        return v
     if v.strip() == "":
         return []
     return [x.strip() for x in v.split(",")]
 
 
-def try_int_converter(v: str, _: ValidationInfo) -> Optional[int]:
-    if v == "":
+def try_int_converter(v: str | int, _: ValidationInfo) -> Optional[int]:
+    if isinstance(v, int):
+        return v
+    if v is None or v == "":
         return None
     try:
         return int(v)
@@ -23,14 +29,16 @@ def try_int_converter(v: str, _: ValidationInfo) -> Optional[int]:
         return None
 
 
-def non_empty_str_or_null(v: str, _: ValidationInfo) -> Optional[str]:
-    if v == "":
+def non_empty_str_or_null(v: str | None, _: ValidationInfo) -> Optional[str]:
+    if v is None or v == "":
         return None
     return v
 
 
-def try_float_converter(v: str, _: ValidationInfo) -> Optional[float]:
-    if v == "":
+def try_float_converter(v: str | float, _: ValidationInfo) -> Optional[float]:
+    if isinstance(v, float):
+        return v
+    if v is None or v == "":
         return None
     try:
         return float(v)
@@ -57,6 +65,25 @@ class Airport(BaseModel):
     home_link: str
     wikipedia_link: str
     keywords: Annotated[List[str], BeforeValidator(csl_converter)]
+
+
+class AirportExtFreq(BaseModel):
+    type: str
+    description: str
+    frequency_mhz: float
+
+
+class AirportFrequency(AirportExtFreq):
+    id: int
+    airport_ref: int
+    airport_ident: str
+
+    def to_ext(self) -> AirportExtFreq:
+        return AirportExtFreq(type=self.type, description=self.description, frequency_mhz=self.frequency_mhz)
+
+
+class AirportExtended(Airport):
+    frequencies: Optional[Dict[str, List[AirportExtFreq]]] = None
 
 
 class Country(BaseModel):

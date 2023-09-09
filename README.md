@@ -26,8 +26,8 @@ with more data validations etc.
 
 ### What's inside?
 
-Supported data models: **airports**, **runways**, **countries** and **navaids**. 
-The rest of the datasets will be available later.
+Supported data models: **airports**, **runways**, **countries**, **regions**, and **navaids**. 
+`airport_ext_*.json` files contain extended airport models including airport controller frequencies.
 
 ### Credits
 

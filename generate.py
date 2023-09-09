@@ -3,7 +3,8 @@ import json
 import logging
 
 from collections import defaultdict
-from ourairports.parsers import parse_airports, parse_countries, parse_runways, parse_navaids, parse_regions
+from ourairports.parsers import parse_airports, parse_countries, parse_runways, parse_navaids, parse_regions, parse_frequencies
+from ourairports.types import AirportExtended
 
 OUTPUT_FOLDER = "output"
 
@@ -16,9 +17,33 @@ def generate_airports():
     logging.info("generating airport map")
     arpt_map = {arpt.ident: arpt.model_dump() for arpt in airports}
     logging.info("dumping airport data")
+
     with open(f"{OUTPUT_FOLDER}/airport_list.json", "w") as f:
         json.dump(arpt_list, f)
     with open(f"{OUTPUT_FOLDER}/airport_map.json", "w") as f:
+        json.dump(arpt_map, f)
+
+    logging.info("loading and parsing frequencies")
+    freqs = parse_frequencies()
+
+    logging.info("generating extended airport structures")
+    arpt_list = []
+    arpt_map = {}
+
+    for arpt in airports:
+        freq_list = freqs.get(arpt.id)
+        arpt = AirportExtended(**arpt.model_dump())
+        if freq_list is not None:
+            freq_map = defaultdict(list)
+            for freq in freq_list:
+                freq_map[freq.type].append(freq.to_ext())
+            arpt.frequencies = dict(freq_map)
+        arpt_list.append(arpt.model_dump())
+        arpt_map[arpt.ident] = arpt.model_dump()
+
+    with open(f"{OUTPUT_FOLDER}/airport_ext_list.json", "w") as f:
+        json.dump(arpt_list, f)
+    with open(f"{OUTPUT_FOLDER}/airport_ext_map.json", "w") as f:
         json.dump(arpt_map, f)
 
 
