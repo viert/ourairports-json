@@ -111,3 +111,14 @@ class NavAid(BaseModel):
     usageType: Annotated[Optional[str], BeforeValidator(non_empty_str_or_null)]
     power: Annotated[Optional[str], BeforeValidator(non_empty_str_or_null)]
     associated_airport: Annotated[Optional[str], BeforeValidator(non_empty_str_or_null)]
+
+
+class Region(BaseModel):
+    id: int
+    code: str
+    local_code: str
+    name: str
+    continent: str
+    iso_country: str
+    wikipedia_link: str
+    keywords: Annotated[List[str], BeforeValidator(csl_converter)]

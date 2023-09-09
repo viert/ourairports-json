@@ -2,7 +2,7 @@ import io
 import requests
 from typing import List, Generator, Dict, Any
 from csv import DictReader
-from ourairports.types import Airport, Country, Runway, NavAid
+from ourairports.types import Airport, Country, Runway, NavAid, Region
 
 
 AIRPORTS_URL = "https://davidmegginson.github.io/ourairports-data/airports.csv"
@@ -42,3 +42,9 @@ def parse_navaids() -> List[NavAid]:
     navaids = [NavAid(**row) for row in load(NAV_AIDS_URL)]
     navaids.sort(key=lambda x: x.id)
     return navaids
+
+
+def parse_regions() -> List[Region]:
+    regions = [Region(**row) for row in load(REGIONS_URL)]
+    regions.sort(key=lambda x: x.id)
+    return regions
