@@ -139,6 +139,42 @@ class NavAid(BaseModel):
     power: Annotated[Optional[str], BeforeValidator(non_empty_str_or_null)]
     associated_airport: Annotated[Optional[str], BeforeValidator(non_empty_str_or_null)]
 
+    def feature(self) -> Dict[str, Any]:
+        props = {
+            "ident": self.ident,
+            "name": self.name,
+            "type": self.type,
+            "frequency_khz": self.frequency_khz
+        }
+
+        extra_props = [
+            "elevation_ft",
+            "dme_frequency_khz",
+            "dme_channel",
+            "dme_latitude_deg",
+            "dme_longitude_deg",
+            "slaved_variation_deg",
+            "magnetic_variation_deg",
+            "usageType",
+            "power",
+            "associated_airport",
+        ]
+
+        for prop in extra_props:
+            prop_value = getattr(self, prop, None)
+            if prop_value is not None:
+                props[prop] = prop_value
+
+        return {
+            "id": self.id,
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [self.longitude_deg, self.latitude_deg]
+            },
+            "properties": props
+        }
+
 
 class Region(BaseModel):
     id: int

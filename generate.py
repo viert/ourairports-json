@@ -96,6 +96,18 @@ def generate_navaids():
     with open(f"{OUTPUT_FOLDER}/navaid_map.json", "w") as f:
         json.dump(navaid_map, f)
 
+    logging.info("generating navaid geojson")
+
+    features = [nav.feature() for nav in navaids]
+    geojson = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+
+    logging.info("dumping navaid geojson")
+    with open(f"{OUTPUT_FOLDER}/navaid.geojson", "w") as f:
+        json.dump(geojson, f)
+
 
 def generate_regions():
     logging.info("loading and parsing regions")

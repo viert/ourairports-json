@@ -29,6 +29,8 @@ with more data validations etc.
 Supported data models: **airports**, **runways**, **countries**, **regions**, and **navaids**. 
 `airport_ext_*.json` files contain extended airport models including airport controller frequencies.
 
+**Experimental**: `navaid.geojson` contains a GeoJSON object with all navaids.
+
 ### Credits
 
 All credits go to [these guys here](https://ourairports.com/stats/contributors.html).
