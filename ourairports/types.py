@@ -1,4 +1,4 @@
-from typing import Optional, List, Callable, Annotated, Dict, Any
+from typing import Optional, List, Callable, Annotated, Dict, Any, Tuple
 from pydantic import BaseModel, ValidationInfo, BeforeValidator
 
 
@@ -95,6 +95,22 @@ class Country(BaseModel):
     keywords: Annotated[List[str], BeforeValidator(csl_converter)]
 
 
+class SplitRunway(BaseModel):
+    airport_ref: int
+    airport_ident: str
+    length_ft: Optional[int]
+    width_ft: Optional[int]
+    surface: str
+    lighted: bool
+    closed: bool
+    ident: str
+    latitude_deg: Optional[float]
+    longitude_deg: Optional[float]
+    elevation_ft: Optional[int]
+    heading_degT: Optional[int]
+    displaced_threshold_ft: Optional[int]
+
+
 class Runway(BaseModel):
     id: int
     airport_ref: int
@@ -117,6 +133,39 @@ class Runway(BaseModel):
     he_heading_degT: Annotated[Optional[int], BeforeValidator(try_int_converter)]
     he_displaced_threshold_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
 
+    def split(self) -> Tuple[SplitRunway, SplitRunway]:
+        return (
+            SplitRunway(
+                airport_ref=self.airport_ref,
+                airport_ident=self.airport_ident,
+                length_ft=self.length_ft,
+                width_ft=self.width_ft,
+                surface=self.surface,
+                lighted=self.lighted,
+                closed=self.closed,
+                ident=self.le_ident,
+                latitude_deg=self.le_latitude_deg,
+                longitude_deg=self.le_longitude_deg,
+                elevation_ft=self.le_elevation_ft,
+                heading_degT=self.le_heading_degT,
+                displaced_threshold_ft=self.le_displaced_threshold_ft
+            ),
+            SplitRunway(
+                airport_ref=self.airport_ref,
+                airport_ident=self.airport_ident,
+                length_ft=self.length_ft,
+                width_ft=self.width_ft,
+                surface=self.surface,
+                lighted=self.lighted,
+                closed=self.closed,
+                ident=self.he_ident,
+                latitude_deg=self.he_latitude_deg,
+                longitude_deg=self.he_longitude_deg,
+                elevation_ft=self.he_elevation_ft,
+                heading_degT=self.he_heading_degT,
+                displaced_threshold_ft=self.he_displaced_threshold_ft
+            ),
+        )
 
 class NavAid(BaseModel):
     id: int

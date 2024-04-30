@@ -67,15 +67,21 @@ def generate_runways():
     logging.info("generating runway structures")
     runway_list = []
     runway_map = defaultdict(list)
+    runway_split_map = defaultdict(dict)
     for rwy in runways:
         dump = rwy.model_dump()
         runway_list.append(dump)
         runway_map[rwy.airport_ident].append(dump)
+        rwy1, rwy2 = [r.model_dump() for r in rwy.split()]
+        runway_split_map[rwy.airport_ident][rwy1["ident"]] = rwy1
+        runway_split_map[rwy.airport_ident][rwy2["ident"]] = rwy2
     logging.info("dumping runway data")
     with open(f"{OUTPUT_FOLDER}/runway_list.json", "w") as f:
         json.dump(runway_list, f)
     with open(f"{OUTPUT_FOLDER}/runway_map.json", "w") as f:
         json.dump(runway_map, f)
+    with open(f"{OUTPUT_FOLDER}/runway_split_map.json", "w") as f:
+        json.dump(runway_split_map, f)
 
 
 def generate_navaids():
