@@ -107,7 +107,7 @@ class SplitRunway(BaseModel):
     latitude_deg: Optional[float]
     longitude_deg: Optional[float]
     elevation_ft: Optional[int]
-    heading_degT: Optional[int]
+    heading_degT: Optional[float]
     displaced_threshold_ft: Optional[int]
 
 
@@ -124,13 +124,13 @@ class Runway(BaseModel):
     le_latitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
     le_longitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
     le_elevation_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
-    le_heading_degT: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    le_heading_degT: Annotated[Optional[float], BeforeValidator(try_float_converter)]
     le_displaced_threshold_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
     he_ident: str
     he_latitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
     he_longitude_deg: Annotated[Optional[float], BeforeValidator(try_float_converter)]
     he_elevation_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
-    he_heading_degT: Annotated[Optional[int], BeforeValidator(try_int_converter)]
+    he_heading_degT: Annotated[Optional[float], BeforeValidator(try_float_converter)]
     he_displaced_threshold_ft: Annotated[Optional[int], BeforeValidator(try_int_converter)]
 
     def split(self) -> Tuple[SplitRunway, SplitRunway]:
